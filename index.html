@@ -1,1 +1,412 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FORGE — Elite Athlete Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;600;700&family=Barlow+Condensed:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+:root{--black:#080A0C;--dark:#0F1217;--card:#141820;--border:#1E2530;--gold:#C8A84B;--gold-light:#E8C96A;--red:#E03C3C;--green:#2ECC71;--text:#D4D8E2;--muted:#6B7280;--white:#F0F2F5;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--black);color:var(--text);font-family:'Barlow',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;}
+body.rtl{direction:rtl;}
+body.rtl .btn-row{flex-direction:row-reverse;}
+body.rtl .pkg-checkbox{left:22px;right:auto;}
+body.rtl .coach-check{left:12px;right:auto;}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:14px 40px;background:rgba(8,10,12,.92);border-bottom:1px solid var(--border);backdrop-filter:blur(14px);}
+.logo{font-family:'Bebas Neue';font-size:2rem;letter-spacing:4px;color:var(--gold);cursor:pointer;}
+.nav-center{display:flex;gap:6px;}
+.nav-step{width:28px;height:3px;border-radius:2px;background:var(--border);transition:background .4s;}
+.nav-step.active{background:var(--gold);}
+.nav-step.done{background:var(--green);}
+.nav-right{display:flex;align-items:center;gap:14px;}
+.lang-picker{position:relative;}
+.lang-btn{background:transparent;border:1px solid var(--border);border-radius:100px;padding:7px 14px;color:var(--text);font-family:'Barlow Condensed';font-size:.78rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;gap:6px;transition:border-color .2s;}
+.lang-btn:hover{border-color:var(--gold);}
+.lang-dropdown{position:absolute;top:calc(100% + 8px);right:0;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;min-width:160px;box-shadow:0 20px 60px rgba(0,0,0,.5);display:none;z-index:300;}
+body.rtl .lang-dropdown{right:auto;left:0;}
+.lang-dropdown.open{display:block;animation:fadeUp .2s ease;}
+.lang-option{padding:11px 18px;font-size:.88rem;cursor:pointer;display:flex;align-items:center;gap:10px;transition:background .15s;}
+.lang-option:hover{background:rgba(255,255,255,.05);}
+.lang-option.active{color:var(--gold);}
+.nav-auth{display:flex;gap:8px;}
+.nav-auth-btn{padding:7px 18px;border-radius:6px;font-family:'Barlow Condensed';font-size:.78rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.nav-login{background:transparent;border:1px solid var(--border);color:var(--text);}
+.nav-login:hover{border-color:var(--gold);color:var(--gold);}
+.nav-signup{background:var(--gold);border:1px solid var(--gold);color:var(--black);font-weight:700;}
+.nav-signup:hover{background:var(--gold-light);}
+.nav-user{display:none;align-items:center;gap:10px;font-size:.85rem;}
+.nav-user .avatar{width:30px;height:30px;border-radius:50%;background:rgba(200,168,75,.2);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:.85rem;}
+.nav-user .user-name{color:var(--gold);font-family:'Barlow Condensed';letter-spacing:1px;}
+.nav-user .logout-btn{background:transparent;border:none;color:var(--muted);font-size:.78rem;cursor:pointer;letter-spacing:1px;font-family:'Barlow Condensed';text-transform:uppercase;}
+.nav-user .logout-btn:hover{color:var(--red);}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
+.modal-overlay.open{display:flex;animation:fadeIn .25s ease;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{background:var(--dark);border:1px solid var(--border);border-radius:16px;width:100%;max-width:440px;padding:40px;position:relative;animation:slideUp .3s ease;margin:16px;}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.modal-close{position:absolute;top:16px;right:20px;background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;}
+.modal-close:hover{color:var(--white);}
+.modal-logo{font-family:'Bebas Neue';font-size:1.6rem;letter-spacing:3px;color:var(--gold);margin-bottom:6px;}
+.modal-sub{font-size:.83rem;color:var(--muted);margin-bottom:28px;}
+.modal-tabs{display:flex;margin-bottom:28px;border-bottom:1px solid var(--border);}
+.modal-tab{flex:1;padding:10px;text-align:center;font-family:'Barlow Condensed';font-size:.85rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all .2s;margin-bottom:-1px;}
+.modal-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.modal-form{display:none;}
+.modal-form.active{display:block;}
+.modal-field{display:flex;flex-direction:column;gap:7px;margin-bottom:16px;}
+.modal-field label{font-family:'Barlow Condensed';letter-spacing:3px;font-size:.68rem;text-transform:uppercase;color:var(--muted);}
+.modal-field input{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:12px 14px;color:var(--white);font-family:'Barlow';font-size:.92rem;font-weight:300;outline:none;transition:border-color .2s;}
+.modal-field input:focus{border-color:var(--gold);}
+.modal-submit{width:100%;padding:14px;border-radius:6px;background:var(--gold);border:none;color:var(--black);font-family:'Barlow Condensed';font-size:1rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;cursor:pointer;transition:all .2s;margin-top:4px;}
+.modal-submit:hover{background:var(--gold-light);}
+.modal-divider{display:flex;align-items:center;gap:12px;margin:18px 0;color:var(--muted);font-size:.78rem;}
+.modal-divider::before,.modal-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.modal-error{color:var(--red);font-size:.8rem;margin-top:8px;display:none;}
+.modal-success{color:var(--green);font-size:.8rem;margin-top:8px;display:none;}
+.modal-social{display:flex;gap:10px;margin-bottom:4px;}
+.social-btn{flex:1;padding:11px;border:1px solid var(--border);border-radius:6px;background:var(--card);color:var(--text);font-family:'Barlow Condensed';font-size:.78rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:border-color .2s;}
+.social-btn:hover{border-color:var(--gold);}
+.page{display:none;min-height:100vh;padding:100px 0 60px;}
+.page.active{display:block;animation:fadeUp .5s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.container{max-width:860px;margin:0 auto;padding:0 32px;}
+.container-wide{max-width:1200px;margin:0 auto;padding:0 32px;}
+.page-label{font-family:'Barlow Condensed';font-weight:300;letter-spacing:6px;font-size:.75rem;color:var(--gold);text-transform:uppercase;margin-bottom:12px;}
+h1{font-family:'Bebas Neue';font-size:clamp(3rem,6vw,5rem);line-height:1;color:var(--white);letter-spacing:2px;margin-bottom:16px;}
+.sub{font-size:1rem;color:var(--muted);line-height:1.7;max-width:520px;margin-bottom:48px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;}
+.form-grid.three{grid-template-columns:1fr 1fr 1fr;}
+.form-group{display:flex;flex-direction:column;gap:8px;}
+label{font-family:'Barlow Condensed';letter-spacing:3px;font-size:.7rem;text-transform:uppercase;color:var(--muted);}
+input,select,textarea{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:13px 16px;color:var(--white);font-family:'Barlow';font-size:.95rem;font-weight:300;transition:border-color .2s;outline:none;-webkit-appearance:none;}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,168,75,.12);}
+select option{background:var(--dark);}
+textarea{resize:vertical;min-height:90px;}
+.radio-group{display:flex;gap:12px;flex-wrap:wrap;}
+.radio-pill{padding:9px 20px;border:1px solid var(--border);border-radius:100px;cursor:pointer;font-size:.85rem;transition:all .2s;user-select:none;background:var(--card);}
+.radio-pill:hover{border-color:var(--gold);color:var(--gold);}
+.radio-pill.selected{background:var(--gold);border-color:var(--gold);color:var(--black);font-weight:700;}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:16px 36px;border-radius:6px;font-family:'Barlow Condensed';font-size:1rem;letter-spacing:3px;text-transform:uppercase;cursor:pointer;border:none;transition:all .25s;}
+.btn-primary{background:var(--gold);color:var(--black);font-weight:700;}
+.btn-primary:hover{background:var(--gold-light);transform:translateY(-2px);box-shadow:0 8px 32px rgba(200,168,75,.3);}
+.btn-outline{background:transparent;color:var(--gold);border:1px solid var(--gold);}
+.btn-outline:hover{background:rgba(200,168,75,.08);}
+.btn-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:36px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px;}
+.divider{border:none;border-top:1px solid var(--border);margin:36px 0;}
+.section-title{display:flex;align-items:center;gap:14px;margin-bottom:24px;}
+.section-title .num{font-family:'Bebas Neue';font-size:1.1rem;color:var(--gold);background:rgba(200,168,75,.1);border:1px solid rgba(200,168,75,.25);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.section-title h3{font-family:'Barlow Condensed';font-size:1.1rem;letter-spacing:2px;text-transform:uppercase;}
+.injury-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.injury-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all .2s;background:var(--dark);font-size:.88rem;}
+.injury-item:hover{border-color:var(--red);}
+.injury-item.selected{border-color:var(--red);background:rgba(224,60,60,.08);}
+.injury-item .dot{width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0;transition:background .2s;}
+.injury-item.selected .dot{background:var(--red);}
+.photo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.photo-zone{aspect-ratio:3/4;border:2px dashed var(--border);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;background:var(--dark);}
+.photo-zone:hover{border-color:var(--gold);}
+.photo-zone.uploaded{border-style:solid;border-color:var(--green);}
+.photo-zone .icon{font-size:2rem;opacity:.4;}
+.photo-zone .label{font-family:'Barlow Condensed';letter-spacing:2px;font-size:.75rem;text-transform:uppercase;color:var(--muted);text-align:center;}
+.photo-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.photo-zone img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.photo-zone .check{position:absolute;top:8px;right:8px;width:24px;height:24px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;color:white;opacity:0;transition:opacity .3s;}
+.photo-zone.uploaded .check{opacity:1;}
+.results-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+.result-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:22px 18px;text-align:center;}
+.result-card .val{font-family:'Bebas Neue';font-size:2.6rem;color:var(--gold);line-height:1;}
+.result-card .unit{font-size:.75rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+.result-card .lbl{font-size:.82rem;color:var(--muted);margin-top:6px;}
+.bar-section{display:flex;flex-direction:column;gap:14px;}
+.bar-row{display:flex;flex-direction:column;gap:6px;}
+.bar-header{display:flex;justify-content:space-between;font-size:.85rem;}
+.bar-track{height:8px;background:var(--border);border-radius:100px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:100px;transition:width 1.2s cubic-bezier(.4,0,.2,1);}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;font-size:.78rem;letter-spacing:1px;font-family:'Barlow Condensed';text-transform:uppercase;}
+.badge-green{background:rgba(46,204,113,.1);color:var(--green);border:1px solid rgba(46,204,113,.2);}
+.badge-red{background:rgba(224,60,60,.1);color:var(--red);border:1px solid rgba(224,60,60,.2);}
+.badge-gold{background:rgba(200,168,75,.1);color:var(--gold);border:1px solid rgba(200,168,75,.2);}
+.coaches-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+.coach-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:pointer;transition:all .3s;position:relative;}
+.coach-card:hover{border-color:var(--gold);transform:translateY(-4px);}
+.coach-card.selected{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold);}
+.coach-img{height:180px;background:linear-gradient(135deg,#1a2030,#0d1018);display:flex;align-items:center;justify-content:center;font-size:4rem;position:relative;}
+.coach-img::before{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 60%,var(--card));}
+.coach-specialty{position:absolute;bottom:12px;left:12px;font-family:'Barlow Condensed';font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);background:rgba(0,0,0,.6);padding:3px 10px;border-radius:100px;}
+.coach-info{padding:16px;}
+.coach-name{font-family:'Bebas Neue';font-size:1.4rem;letter-spacing:1px;}
+.coach-bio{font-size:.82rem;color:var(--muted);line-height:1.6;margin:6px 0 12px;}
+.coach-tags{display:flex;flex-wrap:wrap;gap:6px;}
+.coach-tag{padding:3px 10px;border-radius:100px;border:1px solid var(--border);font-size:.72rem;color:var(--muted);}
+.coach-check{position:absolute;top:12px;right:12px;width:28px;height:28px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;opacity:0;transition:opacity .2s;}
+.coach-card.selected .coach-check{opacity:1;}
+.packages-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-bottom:32px;}
+.pkg-card{background:var(--card);border:2px solid var(--border);border-radius:14px;padding:26px;cursor:pointer;transition:all .3s;position:relative;user-select:none;}
+.pkg-card:hover{border-color:rgba(200,168,75,.4);}
+.pkg-card.selected{border-color:var(--gold);background:rgba(200,168,75,.04);}
+.pkg-card.pro{grid-column:1/-1;border-color:var(--gold);}
+.pkg-card.pro.selected{background:rgba(200,168,75,.07);}
+.pkg-icon{font-size:2rem;margin-bottom:10px;}
+.pkg-name{font-family:'Bebas Neue';font-size:1.5rem;letter-spacing:1px;}
+.pkg-price{font-family:'Bebas Neue';font-size:2rem;color:var(--gold);}
+.pkg-price span{font-family:'Barlow';font-size:.75rem;color:var(--muted);}
+.pkg-desc{font-size:.85rem;color:var(--muted);line-height:1.7;margin-bottom:14px;}
+.pkg-features{display:flex;flex-direction:column;gap:7px;}
+.pkg-feature{display:flex;align-items:center;gap:8px;font-size:.85rem;}
+.pkg-feature .tick{color:var(--green);font-size:.8rem;}
+.pkg-checkbox{position:absolute;top:22px;right:22px;width:22px;height:22px;border:2px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:.75rem;}
+.pkg-card.selected .pkg-checkbox{background:var(--gold);border-color:var(--gold);color:var(--black);}
+.pro-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--gold);color:var(--black);font-family:'Barlow Condensed';font-size:.7rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;padding:4px 16px;border-radius:100px;white-space:nowrap;}
+.summary-row{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--border);font-size:.9rem;}
+.summary-row:last-child{border:none;}
+.summary-total{font-family:'Bebas Neue';font-size:2rem;color:var(--gold);}
+.wa-btn{display:inline-flex;align-items:center;gap:10px;background:#25D366;color:white;padding:14px 28px;border-radius:8px;font-family:'Barlow Condensed';font-size:1rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border:none;font-weight:700;transition:all .25s;text-decoration:none;}
+.wa-btn:hover{background:#1ebe58;transform:translateY(-2px);}
+.hero-bg{position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse at 70% 30%,rgba(200,168,75,.06),transparent 60%),radial-gradient(ellipse at 30% 80%,rgba(224,60,60,.04),transparent 50%);}
+.hero-stat{position:absolute;font-family:'Bebas Neue';font-size:7rem;color:rgba(200,168,75,.04);pointer-events:none;user-select:none;line-height:1;}
+.analysis-loader{display:none;flex-direction:column;align-items:center;gap:18px;padding:60px 0;}
+.analysis-loader.active{display:flex;}
+.scan-line{width:100%;max-width:400px;height:2px;background:var(--border);border-radius:100px;overflow:hidden;position:relative;}
+.scan-line::after{content:'';position:absolute;left:-50%;width:50%;height:100%;background:linear-gradient(to right,transparent,var(--gold),transparent);animation:scan 1.5s ease-in-out infinite;}
+@keyframes scan{to{left:150%;}}
+.scan-text{font-family:'Barlow Condensed';letter-spacing:3px;font-size:.8rem;text-transform:uppercase;color:var(--gold);}
+.alert{padding:14px 18px;border-radius:8px;font-size:.88rem;line-height:1.6;margin-bottom:20px;display:flex;align-items:flex-start;gap:10px;}
+.alert-warn{background:rgba(200,168,75,.08);border:1px solid rgba(200,168,75,.2);color:var(--gold);}
+.alert-info{background:rgba(46,204,113,.06);border:1px solid rgba(46,204,113,.15);color:var(--green);}
+.hero-auth{display:flex;gap:14px;margin-bottom:32px;flex-wrap:wrap;}
+.hero-auth-card{flex:1;min-width:200px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px;cursor:pointer;transition:all .3s;}
+.hero-auth-card:hover{border-color:var(--gold);transform:translateY(-2px);}
+.hero-auth-card.primary-card{border-color:var(--gold);background:rgba(200,168,75,.05);}
+.hero-auth-title{font-family:'Bebas Neue';font-size:1.2rem;letter-spacing:1px;margin-bottom:6px;}
+.hero-auth-sub{font-size:.8rem;color:var(--muted);}
+.welcome-banner{background:linear-gradient(135deg,rgba(200,168,75,.08),rgba(200,168,75,.02));border:1px solid rgba(200,168,75,.2);border-radius:10px;padding:16px 22px;display:none;align-items:center;gap:14px;margin-bottom:32px;}
+.welcome-banner.visible{display:flex;}
+.wb-avatar{width:40px;height:40px;border-radius:50%;background:rgba(200,168,75,.15);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+.wb-text strong{color:var(--gold);font-family:'Bebas Neue';font-size:1.1rem;letter-spacing:1px;}
+.wb-text p{font-size:.82rem;color:var(--muted);}
+@media(max-width:768px){
+  nav{padding:14px 16px;}
+  .nav-center{display:none;}
+  .container,.container-wide{padding:0 16px;}
+  .form-grid,.form-grid.three{grid-template-columns:1fr;}
+  .injury-grid{grid-template-columns:1fr 1fr;}
+  .photo-grid{grid-template-columns:1fr 1fr;}
+  .results-grid{grid-template-columns:1fr 1fr;}
+  .coaches-grid{grid-template-columns:1fr;}
+  .packages-grid{grid-template-columns:1fr;}
+  .pkg-card.pro{grid-column:auto;}
+  .hero-auth{flex-direction:column;}
+  .modal{margin:16px;padding:28px;}
+}
+</style>
+</head>
+<body>
 
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-logo">FORGE</div>
+    <div class="modal-sub" data-i18n="modal_sub">Access your elite athlete dashboard</div>
+    <div class="modal-tabs">
+      <div class="modal-tab active" id="tab-login" onclick="switchTab('login')" data-i18n="nav_login">Log In</div>
+      <div class="modal-tab" id="tab-signup" onclick="switchTab('signup')" data-i18n="nav_signup">Sign Up</div>
+    </div>
+    <div class="modal-form active" id="form-login">
+      <div class="modal-social">
+        <button class="social-btn" onclick="socialLogin('Google')"> Google</button>
+        <button class="social-btn" onclick="socialLogin('Apple')"> Apple</button>
+      </div>
+      <div class="modal-divider">or with email</div>
+      <div class="modal-field"><label>Email</label><input type="email" id="loginEmail" placeholder="athlete@example.com"></div>
+      <div class="modal-field"><label>Password</label><input type="password" id="loginPassword" placeholder="••••••••"></div>
+      <div id="loginError" class="modal-error">Invalid email or password.</div>
+      <button class="modal-submit" onclick="doLogin()" data-i18n="nav_login">Log In</button>
+    </div>
+    <div class="modal-form" id="form-signup">
+      <div class="modal-social">
+        <button class="social-btn" onclick="socialLogin('Google')"> Google</button>
+        <button class="social-btn" onclick="socialLogin('Apple')"> Apple</button>
+      </div>
+      <div class="modal-divider">or with email</div>
+      <div class="modal-field"><label>Full Name</label><input type="text" id="signupName" placeholder="Alex Mercer"></div>
+      <div class="modal-field"><label>Email</label><input type="email" id="signupEmail" placeholder="athlete@example.com"></div>
+      <div class="modal-field"><label>Password</label><input type="password" id="signupPassword" placeholder="Min. 8 characters"></div>
+      <div id="signupError" class="modal-error"></div>
+      <div id="signupSuccess" class="modal-success">Account created! You can now log in.</div>
+      <button class="modal-submit" onclick="doSignup()" data-i18n="nav_signup">Create Account</button>
+    </div>
+  </div>
+</div>
+
+<nav>
+  <div class="logo" onclick="goTo(1)">FORGE</div>
+  <div class="nav-center">
+    <div class="nav-step active" id="ns1"></div>
+    <div class="nav-step" id="ns2"></div>
+    <div class="nav-step" id="ns3"></div>
+    <div class="nav-step" id="ns4"></div>
+    <div class="nav-step" id="ns5"></div>
+    <div class="nav-step" id="ns6"></div>
+  </div>
+  <div class="nav-right">
+    <div class="lang-picker">
+      <button class="lang-btn" onclick="toggleLang()" id="langBtn"> EN</button>
+      <div class="lang-dropdown" id="langDropdown">
+        <div class="lang-option active" onclick="setLang('en')" id="lo-en"> English</div>
+        <div class="lang-option" onclick="setLang('it')" id="lo-it"> Italiano</div>
+        <div class="lang-option" onclick="setLang('fa')" id="lo-fa"> فارسی</div>
+        <div class="lang-option" onclick="setLang('tr')" id="lo-tr"> Türkçe</div>
+      </div>
+    </div>
+    <div class="nav-auth" id="navAuthButtons">
+      <button class="nav-auth-btn nav-login" onclick="openModal('login')" data-i18n="nav_login">Log In</button>
+      <button class="nav-auth-btn nav-signup" onclick="openModal('signup')" data-i18n="nav_signup">Sign Up</button>
+    </div>
+    <div class="nav-user" id="navUser">
+      <div class="avatar" id="navAvatar"></div>
+      <span class="user-name" id="navUserName">—</span>
+      <button class="logout-btn" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<div class="page active" id="page1" style="position:relative;display:flex;align-items:center;min-height:100vh;padding:80px 0;">
+  <div class="hero-bg"></div>
+  <span class="hero-stat" style="top:10%;left:5%;">18.4</span>
+  <span class="hero-stat" style="bottom:10%;right:5%;">92%</span>
+  <div class="container">
+    <div class="welcome-banner" id="welcomeBanner">
+      <div class="wb-avatar"></div>
+      <div class="wb-text"><strong id="welcomeName">—</strong><p>Welcome back. Continue your assessment or review your results.</p></div>
+    </div>
+    <div class="page-label" data-i18n="hero_label">Elite Performance Platform</div>
+    <h1 data-i18n="hero_title">FORGE<br>YOUR PEAK</h1>
+    <p class="sub" data-i18n="hero_sub">Science-backed body analysis, expert coach matching, and precision programming — all in one place. Start with a complete athlete assessment, free of charge.</p>
+    <div class="hero-auth" id="heroAuthCards">
+      <div class="hero-auth-card primary-card" onclick="openModal('signup')">
+        <div class="hero-auth-title" data-i18n="new_athlete">New Athlete?</div>
+        <div class="hero-auth-sub" data-i18n="new_athlete_sub">Create your free account and begin your assessment in minutes.</div>
+      </div>
+      <div class="hero-auth-card" onclick="openModal('login')">
+        <div class="hero-auth-title" data-i18n="already_reg">Already Registered?</div>
+        <div class="hero-auth-sub" data-i18n="already_reg_sub">Log in to continue your assessment or access your programs.</div>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="startAssessment()" data-i18n="begin_btn">Begin Assessment →</button>
+  </div>
+</div>
+
+<div class="page" id="page2">
+  <div class="container">
+    <div class="page-label">Step 1 of 5 — Athlete Profile</div>
+    <h1>YOUR STATS</h1>
+    <p class="sub">Accurate data powers accurate results.</p>
+    <div class="card" style="margin-bottom:24px;">
+      <div class="section-title"><div class="num">1</div><h3>Personal Info</h3></div>
+      <div class="form-grid">
+        <div class="form-group"><label>First Name</label><input type="text" id="firstName" placeholder="Alex"></div>
+        <div class="form-group"><label>Last Name</label><input type="text" id="lastName" placeholder="Mercer"></div>
+        <div class="form-group"><label>Date of Birth</label><input type="date" id="dob"></div>
+        <div class="form-group"><label>Biological Sex</label><select id="sex"><option value="">Select</option><option value="male">Male</option><option value="female">Female</option></select></div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="goTo(1)">← Back</button>
+      <button class="btn btn-primary" onclick="validateAndGoTo3()">Continue →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// --- TRANSLATION DICTIONARY ---
+const TRANSLATIONS = {
+  en: {
+    nav_login: "Log In", nav_signup: "Sign Up", modal_sub: "Access your elite athlete dashboard",
+    hero_label: "Elite Performance Platform", hero_title: "FORGE<br>YOUR PEAK",
+    hero_sub: "Science-backed body analysis, expert coach matching, and precision programming — all in one place. Start with a complete athlete assessment, free of charge.",
+    new_athlete: "New Athlete?", new_athlete_sub: "Create your free account and begin your assessment in minutes.",
+    already_reg: "Already Registered?", already_reg_sub: "Log in to continue your assessment or access your programs.",
+    begin_btn: "Begin Assessment →"
+  },
+  it: {
+    nav_login: "Accedi", nav_signup: "Iscriviti", modal_sub: "Accedi alla tua dashboard da atleta d'élite",
+    hero_label: "Piattaforma per Prestazioni d'Elite", hero_title: "FORGIA IL<br>TUO PICCO",
+    hero_sub: "Analisi corporea basata sulla scienza, abbinamento con coach esperti e programmazione di precisione — tutto in un unico posto. Inizia con una valutazione completa, gratuita.",
+    new_athlete: "Nuovo Atleta?", new_athlete_sub: "Crea il tuo account gratuito e inizia la valutazione in pochi minuti.",
+    already_reg: "Già Registrato?", already_reg_sub: "Accedi per continuare la valutazione o accedere ai tuoi programmi.",
+    begin_btn: "Inizia la Valutazione →"
+  },
+  fa: {
+    nav_login: "ورود", nav_signup: "ثبت نام", modal_sub: "دسترسی به داشبورد ورزشکاران نخبه",
+    hero_label: "پلتفرم عملکرد نخبگان", hero_title: "اوج خود<br>را بساز",
+    hero_sub: "تجزیه و تحلیل بدن با پشتیبانی علمی، تطبیق مربی متخصص و برنامه‌ریزی دقیق — همه در یک مکان. با یک ارزیابی کامل و رایگان شروع کنید.",
+    new_athlete: "ورزشکار جدید؟", new_athlete_sub: "حساب کاربری رایگان خود را ایجاد کنید و ارزیابی را در چند دقیقه شروع کنید.",
+    already_reg: "قبلاً ثبت نام کرده اید؟", already_reg_sub: "برای ادامه ارزیابی یا دسترسی به برنامه‌های خود وارد شوید.",
+    begin_btn: "شروع ارزیابی ←"
+  },
+  tr: {
+    nav_login: "Giriş Yap", nav_signup: "Kayıt Ol", modal_sub: "Elit sporcu paneline eriş",
+    hero_label: "Elit Performans Platformu", hero_title: "ZİRVENE<br>ULAŞ",
+    hero_sub: "Bilim destekli vücut analizi, uzman koç eşleştirme ve hassas programlama — hepsi tek bir yerde. Ücretsiz, eksiksiz bir sporcu değerlendirmesi ile başlayın.",
+    new_athlete: "Yeni Sporcu mu?", new_athlete_sub: "Ücretsiz hesabınızı oluşturun ve değerlendirmenize dakikalar içinde başlayın.",
+    already_reg: "Zaten Kayıtlı mısınız?", already_reg_sub: "Değerlendirmeye devam etmek veya programlarınıza erişmek için giriş yapın.",
+    begin_btn: "Değerlendirmeye Başla →"
+  }
+};
+
+const COACHES={marco:{name:'Marco Ferretti',icon:'',wa:'393000000001'},sara:{name:'Sara Conti',icon:'',wa:'393000000002'},dmitri:{name:'Dmitri Volkov',icon:'',wa:'393000000003'},lena:{name:'Lena Müller',icon:'',wa:'393000000004'},ana:{name:'Ana Pinto',icon:'',wa:'393000000005'},raj:{name:'Raj Mehta',icon:'',wa:'393000000006'}};
+const PKGS={training:{price:49},diet:{price:39},supplement:{price:19},scan:{price:29},pro:{price:129}};
+const NAMES={training:'Training Program',diet:'Diet Plan',supplement:'Supplement Advice',scan:'Abnormality Check',pro:'PRO — Everything'};
+const state={activity:null,goal:null,injuries:[],photos:{},results:{},selectedCoach:null,selectedPackages:new Set()};
+let currentUser=null;
+const users=JSON.parse(localStorage.getItem('forge_users')||'{}');
+let currentPage=1;
+
+function goTo(n){document.getElementById('page'+currentPage).classList.remove('active');document.getElementById('page'+n).classList.add('active');currentPage=n;const m=[null,1,2,2,3,4,5,6,6];const s=m[n]||1;for(let i=1;i<=6;i++){const e=document.getElementById('ns'+i);e.className='nav-step'+(i<s?' done':i===s?' active':'');}window.scrollTo({top:0,behavior:'smooth'});}
+function openModal(t){document.getElementById('authModal').classList.add('open');switchTab(t);}
+function closeModal(){document.getElementById('authModal').classList.remove('open');document.getElementById('loginError').style.display='none';document.getElementById('signupError').style.display='none';document.getElementById('signupSuccess').style.display='none';}
+document.getElementById('authModal').addEventListener('click',e=>{if(e.target===document.getElementById('authModal'))closeModal();});
+function switchTab(t){['login','signup'].forEach(tab=>{document.getElementById('tab-'+tab).classList.toggle('active',tab===t);document.getElementById('form-'+tab).classList.toggle('active',tab===t);});}
+function doLogin(){const email=document.getElementById('loginEmail').value.trim();const pw=document.getElementById('loginPassword').value;const err=document.getElementById('loginError');if(!users[email]||users[email].password!==pw){err.style.display='block';return;}err.style.display='none';currentUser={name:users[email].name,email};closeModal();updateAuthUI();}
+function doSignup(){const name=document.getElementById('signupName').value.trim();const email=document.getElementById('signupEmail').value.trim();const pw=document.getElementById('signupPassword').value;const err=document.getElementById('signupError');const ok=document.getElementById('signupSuccess');err.style.display='none';ok.style.display='none';if(!name||!email||!pw){err.textContent='Please fill in all fields.';err.style.display='block';return;}if(pw.length<6){err.textContent='Password must be at least 6 characters.';err.style.display='block';return;}if(users[email]){err.textContent='An account with this email already exists.';err.style.display='block';return;}users[email]={name,password:pw};localStorage.setItem('forge_users',JSON.stringify(users));ok.style.display='block';setTimeout(()=>{switchTab('login');document.getElementById('loginEmail').value=email;},1500);}
+function socialLogin(p){currentUser={name:p+' User',email:p.toLowerCase()+'@forge.com'};closeModal();updateAuthUI();}
+function doLogout(){currentUser=null;updateAuthUI();}
+function updateAuthUI(){const li=!!currentUser;document.getElementById('navAuthButtons').style.display=li?'none':'flex';document.getElementById('navUser').style.display=li?'flex':'none';document.getElementById('heroAuthCards').style.display=li?'none':'flex';const b=document.getElementById('welcomeBanner');if(li){b.classList.add('visible');document.getElementById('welcomeName').textContent=currentUser.name;document.getElementById('navUserName').textContent=currentUser.name.split(' ')[0];document.getElementById('navAvatar').textContent=currentUser.name[0].toUpperCase();}else{b.classList.remove('visible');}}
+function startAssessment(){if(!currentUser){openModal('signup');return;}goTo(2);}
+
+function toggleLang(){document.getElementById('langDropdown').classList.toggle('open');}
+function setLang(l){
+  const labels={en:' EN',it:' IT',fa:' FA',tr:' TR'};
+  document.getElementById('langBtn').textContent=labels[l];
+  document.getElementById('langDropdown').classList.remove('open');
+  document.querySelectorAll('.lang-option').forEach(o=>o.classList.remove('active'));
+  document.getElementById('lo-'+l).classList.add('active');
+ 
+  if(l==='fa'){
+    document.body.classList.add('rtl');
+    document.documentElement.setAttribute('dir','rtl');
+  }else{
+    document.body.classList.remove('rtl');
+    document.documentElement.setAttribute('dir','ltr');
+  }
+
+  // APPLLY TRANSLATIONS TO HTML ELEMENTS
+  if(TRANSLATIONS[l]) {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if(TRANSLATIONS[l][key]) {
+        el.innerHTML = TRANSLATIONS[l][key];
+      }
+    });
+  }
+}
+document.addEventListener('click',e=>{if(!e.target.closest('.lang-picker'))document.getElementById('langDropdown').classList.remove('open');});
+updateAuthUI();
+
+// Set initial language if preferred
+// setLang('en');
+</script>
+</body>
+</html>
